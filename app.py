@@ -43,7 +43,7 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website_link = db.Column(db.String(120))
-    looking_for_talent = db.Column(db.Boolean(), default=False)
+    seeking_talent = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String())
     shows = db.relationship('Show', backref='venue', lazy=True)
     
@@ -64,7 +64,7 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website_link = db.Column(db.String(120))
-    looking_for_venues = db.Column(db.Boolean(), default=False)
+    seeking_venues = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String())
     shows = db.relationship('Show', backref='artist', lazy=True)
 
@@ -271,6 +271,19 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
+  form = VenueForm()
+
+  name = form.name.data.strip()
+  city = form.city.data.strip()
+  state = form.state.data.strip()
+  address = form.address.data.strip()
+  phone = form.phone.data.strip()
+  image_link = form.image_link.data.strip()
+  facebook_link = form.facebook_link.data.strip()
+  website_link = form.website_link.data.strip()
+  seeking_talent = form.seeking_talent.data.strip()
+  seeking_description = form.seeking_description.data.strip()
+
 
   # on successful db insert, flash success
   flash('Venue ' + request.form['name'] + ' was successfully listed!')
@@ -465,6 +478,7 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
+  
 
   # on successful db insert, flash success
   flash('Artist ' + request.form['name'] + ' was successfully listed!')
