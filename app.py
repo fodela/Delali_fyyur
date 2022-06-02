@@ -46,6 +46,9 @@ class Venue(db.Model):
     looking_for_talent = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String())
     shows = db.relationship('Show', backref='venue', lazy=True)
+    
+    def __repr__(self):
+      return f"<Venue | {self.id}  {self.name}  >"
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -64,23 +67,23 @@ class Artist(db.Model):
     looking_for_venues = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String())
     shows = db.relationship('Show', backref='artist', lazy=True)
+
+    def __repr__(self):
+      return f"<Artist | {self.id}  {self.name}  >"
+
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 class Show(db.Model):
   __table__name = 'Show'
   id = db.Column(db.Integer, primary_key=True)
+  start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
   venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
   artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
-
-
   
-# class Venue(db.Model):
-#   __tablename__ = 'venues'
-  # id = db.Column(db.Integer, primary_key=True)
-  # name = db.Column(db.String())
-  # artist_id
-  # pass
+  def __repr__(self):
+    return f"<Show | {self.id} venue: {self.venue_id} artist: {self.artist_id} >"
+
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -111,27 +114,50 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
+  
+  data = []
+
+  # all venue info
+  
+  venues = Venue.query.all()
+  for venue in venues:
+    data.append(
+      {
+        "city": venue.city,
+        "state": venue.state,
+        "venues": [
+          {
+            "id": venue.id,
+            "name": venue.name,
+            "num_upcoming_shows": Show.query.filter_by(venue_id = venue.id) # -> query all show at that venues
+          }
+        ]
+
+      }
+    )
+
+
+  # data=[{
+  #   "city": "San Francisco",
+  #   "state": "CA",
+  #   "venues": [{
+  #     "id": 1,
+  #     "name": "The Musical Hop",
+  #     "num_upcoming_shows": 0,
+  #   }, {
+  #     "id": 3,
+  #     "name": "Park Square Live Music & Coffee",
+  #     "num_upcoming_shows": 1,
+  #   }]
+  # }, {
+  #   "city": "New York",
+  #   "state": "NY",
+  #   "venues": [{
+  #     "id": 2,
+  #     "name": "The Dueling Pianos Bar",
+  #     "num_upcoming_shows": 0,
+  #   }]
+  # }]
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
