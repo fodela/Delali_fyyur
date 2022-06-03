@@ -409,14 +409,14 @@ def show_artist(artist_id):
   # TODO: replace with real artist data from the artist table, using artist_id
 
   artist = Artist.query.get(artist_id)
-  
-  past_shows = Artist.query.filter(Artist.start_time < datetime.now() and Artist.id == artist_id).all()
+    
+  past_shows = Show.query.filter(Show.start_time < datetime.now() and artist_id == artist_id).all()
 
-  num_past_shows = Artist.query.filter(Artist.start_time < datetime.now() and Artist.id == artist_id).count()
+  num_past_shows = Show.query.filter(Show.start_time < datetime.now() and artist_id == artist_id).count()
 
-  upcoming_shows = Artist.query.filter(Artist.start_time > datetime.now() and Artist.id == artist_id).all()
+  upcoming_shows = Show.query.filter(Show.start_time > datetime.now() and artist_id == artist_id).all()
 
-  num_upcoming_shows = Artist.query.filter(Artist.start_time > datetime.now() and Artist.id == artist_id).count()
+  num_upcoming_shows = Show.query.filter(Show.start_time > datetime.now() and artist_id == artist_id).count()
 
   data = {
     'id' : artist.id,
