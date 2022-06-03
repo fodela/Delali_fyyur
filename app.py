@@ -84,23 +84,6 @@ def venues():
         'venues': venues
         }
       )
-  
-
-
-    
-    print(data)
-  # data.append({
-  #   'city':city,
-  #   'state':state,
-  #   'venues': venues
-  #   }]
-  # })
-    
-
-
-
-
-
     # data=[{
   #   "city": "San Francisco",
   #   "state": "CA",
@@ -130,12 +113,20 @@ def search_venues():
   # search for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
   search_term = request.form.get('search_term','')
-  search_result = Venue.query.filter(Venue.name.ilike(f"%{search_term}%"))
+  results = Venue.query.filter(Venue.name.ilike(f"%{search_term}%"))
 
   response={
-    "count": len(search_result),
-    "data": search_result
+    "count": results.count(),
+    "data": [{
+      "id": result.id,
+      "name": result.name,
+      "num_upcoming_shows": Show.query.filter(Show.start_time > datetime.now() , Show.venue_id == result.id).count()
+    }
+    for result in results
+    ]
   }
+
+  flash(response)
 
   # response={
   #   "count": 1,
