@@ -119,7 +119,7 @@ def venues():
   data = []
 
   # get unique location -> location is city and state
-  locations = Venue.query(Venue.city, Venue.state).distinct().all()
+  locations = Venue.query.with_entities(Venue.city, Venue.state).distinct().all()
   
   for location in locations:
     city = location[0],
