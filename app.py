@@ -307,30 +307,23 @@ def create_venue_submission():
   # TODO: modify data to be the data object returned from db insertion
   form = VenueForm()
 
-  name = form.name.data.strip()
-  city = form.city.data.strip()
-  state = form.state.data.strip()
-  address = form.address.data.strip()
-  phone = form.phone.data.strip()
-  genres = form.genres.data
-  image_link = form.image_link.data.strip()
-  facebook_link = form.facebook_link.data.strip()
-  website_link = form.website_link.data.strip()
-  seeking_talent = form.seeking_talent.data
-  seeking_description = form.seeking_description.data.strip()
+  
 
 
   try:
 
-    venue = Venue(name=name,
-                  city=city,
-                  state=state,
-                  address=address,
-                  phone=phone,
-                  genres=genres,
-                  image_link=image_link,
-                  facebook_link=facebook_link,
-                  website_link=website_link,seeking_talent=seeking_talent,seeking_description=seeking_description
+    venue = Venue(
+      name = form.name.data.strip(),
+      city = form.city.data.strip(),
+      state = form.state.data.strip(),
+      address = form.address.data.strip(),
+      phone = form.phone.data.strip(),
+      genres = form.genres.data,
+      image_link = form.image_link.data.strip(),
+      facebook_link = form.facebook_link.data.strip(),
+      website_link = form.website_link.data.strip(),
+      seeking_talent = form.seeking_talent.data,
+      seeking_description = form.seeking_description.data.strip()
                   )
 
     db.session.add(venue)
@@ -605,24 +598,27 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-  form = ArtistForm()
+ 
 
-  name = form.name.data.strip()
-  city = form.city.data.strip()
-  state = form.state.data
-  address = form.address.data.strip()
-  phone = form.phone.data.strip()
-  genres = form.genres.data
-  image_link = form.image_link.data.strip()
-  facebook_link = form.facebook_link.data.strip()
-  website_link = form.website_link.data.strip()
-  seeking_venue = form.seeking_venue.data.strip()
-  seeking_description = form.seeking_description.data.strip()
+  
 
   
 
   try:
-    artist = Artist(name=name,city=city,state=state,address=address,phone=phone,genres=genres,image_link=image_link,facebook_link=facebook_link,website_link=website_link,seeking_venue=seeking_venue,seeking_description=seeking_description)
+    form = ArtistForm()
+
+    artist = Artist(
+      name = form.name.data.strip(),
+      city = form.city.data.strip(),
+      state = form.state.data,
+      phone = form.phone.data.strip(),
+      genres = form.genres.data,
+      image_link = form.image_link.data.strip(),
+      facebook_link = form.facebook_link.data.strip(),
+      website_link = form.website_link.data.strip(),
+      seeking_venue = form.seeking_venue.data,
+      seeking_description = form.seeking_description.data.strip()
+    )
 
     db.session.add(artist)
     db.commit()
