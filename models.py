@@ -20,7 +20,7 @@ class Venue(db.Model):
     shows = db.relationship('Show', backref='venue', lazy=True)
     
     def __repr__(self):
-      return f"<Venue | {self.id}  {self.name}  >"
+      return f"<Venue | {self.id}  {self.name} Image: {self.image_link} >"
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -41,7 +41,7 @@ class Artist(db.Model):
     shows = db.relationship('Show', backref='artist', lazy=True)
 
     def __repr__(self):
-      return f"<Artist | {self.id}  {self.name}  >"
+      return f"<Artist | ID: {self.id} Name: {self.name} Image: {self.image_link} >"
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -54,4 +54,4 @@ class Show(db.Model):
   artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
   
   def __repr__(self):
-    return f"<Show | {self.id} venue: {self.venue_id} artist: {self.artist_id} >"
+    return f"<Show | {self.id} venue: {self.venue_id} artist: {self.artist_id} starts at: {self.start_time}>"

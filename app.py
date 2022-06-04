@@ -4,6 +4,7 @@
 
 from email.policy import default
 import json
+from this import d
 import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
@@ -83,22 +84,6 @@ def venues():
     }
     for location in locations
   ]
-  
-  # for location in locations:
-  #   city = location.city,
-  #   state = location.state,
-  #   venues = [{'id': venue.id, 
-  #           'name': venue.name,
-  #           "num_upcoming_shows":Show.query.filter(Show.start_time > datetime.now() , Show.venue_id == venue.id).count()} 
-  #           for venue in Venue.query.with_entities(Venue.id,Venue.name).filter(Venue.city == city, Venue.state == state).all()
-  #           ]
-  #   data.append(
-  #     {
-  #       'city':city,
-  #       'state':state,
-  #       'venues': venues
-  #       }
-  #     )
   flash(data)
     # data=[{
   #   "city": "San Francisco",
@@ -166,6 +151,8 @@ def show_venue(venue_id):
 
   num_upcoming_shows = Show.query.filter(Show.start_time > datetime.now(), Show.venue_id == venue_id).count()
   
+  data = {}
+
 
   data = {
     'id' : venue.id,
@@ -182,16 +169,17 @@ def show_venue(venue_id):
     'seeking_description' : venue.seeking_description,
     "past_shows": [{
       "artist_id": past_show.artist_id,
-      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = past_show.id).first().name,
-      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = past_show.id).first().image_link,
+      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = past_show.artist_id).first().name,
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = past_show.artist_id).first().image_link,
       "start_time": str(past_show.start_time)
     }
     for past_show in past_shows
+
     ],
     "upcoming_shows": [{
       "artist_id": upcoming_show.artist_id,
-      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.id).first().name,
-      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.id).first().image_link,
+      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.artist_id).first().name,
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.artist_id).first().image_link,
       "start_time": str(upcoming_show.start_time)
     }
     for upcoming_show in upcoming_shows
@@ -201,9 +189,6 @@ def show_venue(venue_id):
     "upcoming_shows_count": num_upcoming_shows,
     }
 
-  flash(data)
-  for d in data:
-   print(f'{d} = {data[d]} \n--------------- \n')
 
   # data1={
   #   "id": 1,
