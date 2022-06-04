@@ -66,23 +66,25 @@ def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
   
-  data = []
-
   # get unique location -> location is city and state --> City,State 
   locations = Venue.query.with_entities(Venue.city, Venue.state).distinct().all()
 
   # loop through every unique location and assign the various variables
-  # Using list comprehension nested into another list comprehension
+  # Using list comprehensions -> for loop and append to the data list in one step
   data= [{
     'city': location[0],
     'state': location[1],
-    'venues': [{'id': venue.id, 
+    'venues': [{
+            # declare the various properties of venue while
+            'id': venue.id, 
             'name': venue.name,
             "num_upcoming_shows":Show.query.filter(Show.start_time > datetime.now() , Show.venue_id == venue.id).count()} 
+            #looping through all the venues in the various location
             for venue in Venue.query.with_entities(Venue.id,Venue.name).filter(Venue.city == location[0], Venue.state == location[1]).all()
             ]
 
     }
+    # loop through the various city and state and create a unique instance of city and state
     for location in locations
   ]
 
@@ -97,11 +99,13 @@ def search_venues():
   search_term = request.form.get('search_term','')
   results = Venue.query.filter(Venue.name.ilike(f"%{search_term}%"))
 
+  # Using list comprehension
   response={
     "count": results.count(),
     "data": [{
       "id": result.id,
       "name": result.name,
+      # add list of all upcoming shows of the venue
       "num_upcoming_shows": Show.query.filter(Show.start_time > datetime.now() , Show.venue_id == result.id).count()
     }
     for result in results
@@ -115,6 +119,7 @@ def search_venues():
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: <DONE> replace with real venue data from the venues table, using venue_id
+
   venue = Venue.query.get(venue_id)
 
   past_shows = Show.query.filter(Show.start_time < datetime.now(), Show.venue_id == venue_id).all()
@@ -124,9 +129,6 @@ def show_venue(venue_id):
   upcoming_shows = Show.query.filter(Show.start_time > datetime.now(), Show.venue_id == venue_id).all()
 
   num_upcoming_shows = Show.query.filter(Show.start_time > datetime.now(), Show.venue_id == venue_id).count()
-  
-  data = {}
-
 
   data = {
     'id' : venue.id,
@@ -178,8 +180,11 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO:<DONE> modify data to be the data object returned from db insertion
+  
+  #Using flask_wtf form
   form = VenueForm()
 
+  # Ensuring all or none principle of transactions using try except finally -> if there is an error the database will not be updated
   try:
 
     venue = Venue(
@@ -217,13 +222,14 @@ def create_venue_submission():
 def delete_venue(venue_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+
   try:
     venue = Venue.query.get(venue_id)
     db.session.delete(venue)
     db.session.commit()
     flash(f'Venue was successfully deleted!')
 
-  except Exception as e:
+  except:
     db.session.rollback()
     flash(f'An error occurred. Venue  could not be deleted.')
 
@@ -240,18 +246,18 @@ def delete_venue(venue_id):
 @app.route('/artists')
 def artists():
   # TODO:<DONE> replace with real data returned from querying the database
-  data = []
+
   # get all artists
   artists = Artist.query.with_entities(Artist.id,Artist.name)
 
   # create each artist
-  for artist in artists:
-    data.append(
-      {
-        'id': artist.id,
-        'name' : artist.name
-      }
-    )
+  data = [{
+
+      'id': artist.id,
+      'name' : artist.name
+  }
+      for artist in artists
+  ]
 
   return render_template('pages/artists.html', artists=data)
 
@@ -305,16 +311,16 @@ def show_artist(artist_id):
     'seeking_description' : artist.seeking_description,
     "past_shows": [{
       "venue_id": past_show.venue_id,
-      "venue_name": Artist.query.with_entities(Artist.name).filter_by(id = past_show.venue_id).first().name,
-      "venue_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = past_show.venue_id).first().image_link,
+      "venue_name": Venue.query.with_entities(Venue.name).filter_by(id = past_show.venue_id).first().name,
+      "venue_image_link":Venue.query.with_entities(Venue.image_link).filter_by(id = past_show.venue_id).first().image_link,
       "start_time": str(past_show.start_time)
     }
     for past_show in past_shows
     ],
      "upcoming_shows": [{
       "venue_id": upcoming_show.venue_id,
-      "venue_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.venue_id).first().name,
-      "venue_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.venue_id).first().image_link,
+      "venue_name": Venue.query.with_entities(Venue.name).filter_by(id = upcoming_show.venue_id).first().name,
+      "venue_image_link":Venue.query.with_entities(Venue.image_link).filter_by(id = upcoming_show.venue_id).first().image_link,
       "start_time": str(upcoming_show.start_time)
     }
     for upcoming_show in upcoming_shows
