@@ -126,8 +126,6 @@ def search_venues():
     ]
   }
 
-  flash(response)
-
   # response={
   #   "count": 1,
   #   "data": [{
@@ -141,7 +139,7 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
+  # TODO: <DONE> replace with real venue data from the venues table, using venue_id
   venue = Venue.query.get(venue_id)
 
   past_shows = Show.query.filter(Show.start_time < datetime.now(), Show.venue_id == venue_id).all()
@@ -166,11 +164,30 @@ def show_venue(venue_id):
     'website_link' : venue.website_link,
     'seeking_talent' : venue.seeking_talent,
     'seeking_description' : venue.seeking_description,
-    'past_shows': past_shows,
-    "upcoming_shows": upcoming_shows,
+    "past_shows": [{
+      "artist_id": past_show.artist_id,
+      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = past_show.id).first().name,
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = past_show.id).first().image_link,
+      "start_time": str(past_show.start_time)
+    }
+    for past_show in past_shows
+    ],
+    "upcoming_shows": [{
+      "artist_id": upcoming_show.artist_id,
+      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.id).first().name,
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.id).first().image_link,
+      "start_time": str(upcoming_show.start_time)
+    }
+    for upcoming_show in upcoming_shows
+    ],
+
     "past_shows_count": num_past_shows,
     "upcoming_shows_count": num_upcoming_shows,
     }
+
+  flash(data)
+  for d in data:
+   print(f'{d} = {data[d]} \n--------------- \n')
 
   # data1={
   #   "id": 1,
@@ -250,6 +267,8 @@ def show_venue(venue_id):
   #   "upcoming_shows_count": 1,
   # }
   # data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
+  
+  # data = list(filter(lambda d: d['id'] == venue_id, [data]))[0]
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
