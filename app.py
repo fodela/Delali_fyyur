@@ -247,7 +247,7 @@ def delete_venue(venue_id):
 def artists():
   # TODO:<DONE> replace with real data returned from querying the database
 
-  # get all artists
+  # get only id and name column of all artists
   artists = Artist.query.with_entities(Artist.id,Artist.name)
 
   # create each artist
@@ -508,6 +508,7 @@ def shows():
     "artist_id":show.artist_id,
     "artist_name":  Artist.query.with_entities(Artist.name).filter_by(id = show.artist_id).first().name,
       "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = show.artist_id).first().image_link,
+    #convert datetime to string
     "start_time": str(show.start_time)
   }
   for show in shows
@@ -542,7 +543,7 @@ def create_show_submission():
 
     # on successful db insert, flash success
     flash('Show was successfully listed!')
-  except Exception as e:
+  except:
   # TODO:<DONE> on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Show could not be listed.')
 
