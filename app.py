@@ -789,7 +789,7 @@ def create_show_submission():
     form = ShowForm()
 
     artist_id = form.artist_id.data
-    venue_id = form.venue_time.data
+    venue_id = form.venue_id.data
     start_time = form.start_time.data
 
     show = Show(artist_id=artist_id,venue_id=venue_id,start_time=start_time)
@@ -799,9 +799,10 @@ def create_show_submission():
 
     # on successful db insert, flash success
     flash('Show was successfully listed!')
-  except:
+  except Exception as e:
   # TODO:<DONE> on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Show could not be listed.')
+    flash(e)
     db.session.rollback()
   # e.g., flash('An error occurred. Show could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
