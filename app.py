@@ -4,10 +4,11 @@
 
 from email.policy import default
 import json
+from pickle import NONE
 from this import d
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, jsonify, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -180,7 +181,6 @@ def show_venue(venue_id):
       "artist_id": upcoming_show.artist_id,
       "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.artist_id).first().name,
       "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.artist_id).first().image_link,
-      # "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
       "start_time": str(upcoming_show.start_time)
     }
     for upcoming_show in upcoming_shows
@@ -331,11 +331,12 @@ def delete_venue(venue_id):
     venue = Venue.query.get(venue_id)
     db.session.delete(venue)
     db.session.commit()
-    flash('Venue was successfully deleted!')
+    flash(f'Venue was successfully deleted!')
 
-  except:
+  except Exception as e:
     db.session.rollback()
-    flash('An error occurred. Venue could not be deleted.')
+    flash(f'An error occurred. Venue  could not be deleted.')
+    print("#############",e)
 
   finally:
     db.session.close()
@@ -343,7 +344,7 @@ def delete_venue(venue_id):
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return redirect(url_for('venues'))
+  return render_template('pages/home.html')
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -437,17 +438,17 @@ def show_artist(artist_id):
     'seeking_venue' : artist.seeking_venues,
     'seeking_description' : artist.seeking_description,
     "past_shows": [{
-      "artist_id": past_show.artist_id,
-      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = past_show.artist_id).first().name,
-      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = past_show.artist_id).first().image_link,
+      "venue_id": past_show.venue_id,
+      "venue_name": Artist.query.with_entities(Artist.name).filter_by(id = past_show.venue_id).first().name,
+      "venue_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = past_show.venue_id).first().image_link,
       "start_time": str(past_show.start_time)
     }
     for past_show in past_shows
     ],
      "upcoming_shows": [{
-      "artist_id": upcoming_show.artist_id,
-      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.artist_id).first().name,
-      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.artist_id).first().image_link,
+      "venue_id": upcoming_show.venue_id,
+      "venue_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.venue_id).first().name,
+      "venue_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.venue_id).first().image_link,
       "start_time": str(upcoming_show.start_time)
     }
     for upcoming_show in upcoming_shows
@@ -456,7 +457,15 @@ def show_artist(artist_id):
     "upcoming_shows_count": num_upcoming_shows,
     }
 
-  flash(data['past_shows'][0]['artist_image_link'])
+    # "past_shows": [{
+#       "venue_id": 1,
+#       "venue_name": "The Musical Hop",
+#       "venue_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
+#       "start_time": "2019-05-21T21:30:00.000Z"
+#     }]
+
+  flash(data['past_shows'][0]['venue_image_link'])
+  flash(data['past_shows'][2]['venue_image_link'])
 #   data1={
 #     "id": 4,
 #     "name": "Guns N Petals",
@@ -589,10 +598,9 @@ def edit_artist_submission(artist_id):
 
     db.session.commit()
     flash('Artist was successfully edited!')
-  except Exception as e:
+  except:
     db.session.rollback()
     flash('An error occurred. Artist could not be listed.')
-    flash(e)
 
   finally:
     db.session.close()
@@ -620,6 +628,7 @@ def edit_venue(venue_id):
     'seeking_description' : venue.seeking_description,    
     }
 
+  
   # venue={
   #   "id": 1,
   #   "name": "The Musical Hop",
@@ -662,7 +671,7 @@ def edit_venue_submission(venue_id):
   except Exception as e:
     db.session.rollback()
     flash('An error occurred. Artist could not be listed.')
-    print("###############",e)
+    
 
   finally:
     db.session.close()
@@ -734,7 +743,7 @@ def shows():
       "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = show.venue.id).first(),
     "artist_id":show.artist_id,
     "artist_name":  Artist.query.with_entities(Artist.name).filter_by(id = show.artist_id).first().name,
-      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = show.artist_id).first(),
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = show.artist_id).first().image_link,
     "start_time": str(show.start_time)
   }
   for show in shows
