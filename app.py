@@ -66,24 +66,40 @@ def venues():
   
   data = []
 
-  # get unique location -> location is city and state
+  # get unique location -> location is city and state --> City,State 
   locations = Venue.query.with_entities(Venue.city, Venue.state).distinct().all()
-  
-  for location in locations:
-    city = location[0],
-    state = location[1],
-    venues = [{'id': venue.id, 
+
+  # loop through every unique location and assign the various variables
+  # Using list comprehension nested into another list comprehension
+  data= [{
+    'city': location[0],
+    'state': location[1],
+    'venues': [{'id': venue.id, 
             'name': venue.name,
             "num_upcoming_shows":Show.query.filter(Show.start_time > datetime.now() , Show.venue_id == venue.id).count()} 
-            for venue in Venue.query.with_entities(Venue.id,Venue.name).filter(Venue.city == city, Venue.state == state).all()
+            for venue in Venue.query.with_entities(Venue.id,Venue.name).filter(Venue.city == location[0], Venue.state == location[1]).all()
             ]
-    data.append(
-      {
-        'city':city,
-        'state':state,
-        'venues': venues
-        }
-      )
+
+    }
+    for location in locations
+  ]
+  
+  # for location in locations:
+  #   city = location.city,
+  #   state = location.state,
+  #   venues = [{'id': venue.id, 
+  #           'name': venue.name,
+  #           "num_upcoming_shows":Show.query.filter(Show.start_time > datetime.now() , Show.venue_id == venue.id).count()} 
+  #           for venue in Venue.query.with_entities(Venue.id,Venue.name).filter(Venue.city == city, Venue.state == state).all()
+  #           ]
+  #   data.append(
+  #     {
+  #       'city':city,
+  #       'state':state,
+  #       'venues': venues
+  #       }
+  #     )
+  flash(data)
     # data=[{
   #   "city": "San Francisco",
   #   "state": "CA",
