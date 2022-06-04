@@ -29,19 +29,19 @@ class Artist(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
+    city = db.Column(db.String(120), nullable=False)
+    state = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(120))
     genres = db.Column(db.ARRAY(db.String()), nullable=False)
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website_link = db.Column(db.String(120))
-    seeking_venues = db.Column(db.Boolean(), default=False)
+    seeking_venues = db.Column(db.Boolean(), default=False, nullable=False)
     seeking_description = db.Column(db.String())
     shows = db.relationship('Show', backref='artist', lazy=True)
 
     def __repr__(self):
-      return f"<Artist | ID: {self.id} Name: {self.name} Image: {self.image_link} >"
+      return f"<Artist | ID: {self.id} Name: {self.name} Image: {self.genres} >"
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -54,4 +54,4 @@ class Show(db.Model):
   artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
   
   def __repr__(self):
-    return f"<Show | {self.id} venue: {self.venue_id} artist: {self.artist_id} starts at: {self.start_time}>"
+    return f"<Show | id: {self.id} venue: {self.venue_id} artist: {self.artist_id} starts at: {self.start_time}>"

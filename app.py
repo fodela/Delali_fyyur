@@ -85,7 +85,7 @@ def venues():
     }
     for location in locations
   ]
-  flash(data)
+
   
   return render_template('pages/venues.html', areas=data);
 
@@ -180,9 +180,6 @@ def create_venue_submission():
   # TODO:<DONE> modify data to be the data object returned from db insertion
   form = VenueForm()
 
-  
-
-
   try:
 
     venue = Venue(
@@ -229,7 +226,6 @@ def delete_venue(venue_id):
   except Exception as e:
     db.session.rollback()
     flash(f'An error occurred. Venue  could not be deleted.')
-    print("#############",e)
 
   finally:
     db.session.close()
@@ -262,7 +258,7 @@ def artists():
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
-  # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
+  # search for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
   search_term = request.form.get('search_term', '')
   results = Artist.query.filter(Artist.name.ilike(f"%{search_term}%"))
@@ -326,9 +322,6 @@ def show_artist(artist_id):
     "past_shows_count": num_past_shows,
     "upcoming_shows_count": num_upcoming_shows,
     }
- 
-  flash(data['past_shows'][0]['venue_image_link'])
-  flash(data['past_shows'][2]['venue_image_link'])
 
   return render_template('pages/show_artist.html', artist=data)
 
@@ -435,7 +428,7 @@ def edit_venue_submission(venue_id):
 
     db.session.commit()
     flash('Artist was successfully edited!')
-  except Exception as e:
+  except:
     db.session.rollback()
     flash('An error occurred. Artist could not be listed.')
     
@@ -474,20 +467,16 @@ def create_artist_submission():
       seeking_description = form.seeking_description.data.strip()
     )
 
-    flash(form.genres.data)
-
-
     db.session.add(artist)
     db.session.commit()
 
     # on successful db insert, flash success
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
     # TODO:<Done> on unsuccessful db insert, flash an error instead.
-  except Exception as e:
+  except:
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
     flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
 
-    flash(e)
     db.session.rollback()
 
   finally:
@@ -550,7 +539,7 @@ def create_show_submission():
   except Exception as e:
   # TODO:<DONE> on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Show could not be listed.')
-    flash(e)
+
     db.session.rollback()
   # e.g., flash('An error occurred. Show could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
