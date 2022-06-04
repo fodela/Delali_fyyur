@@ -325,6 +325,19 @@ def create_venue_submission():
 def delete_venue(venue_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+  try:
+    venue = Venue.query.get(venue_id)
+    db.session.delete(venue)
+    db.session.commit()
+    flash('Venue was successfully edited!')
+
+  except:
+    db.session.rollback()
+    flash('An error occurred. Venue could not be listed.')
+
+  finally:
+    db.session.close()
+
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
@@ -705,19 +718,20 @@ def shows():
   # TODO: replace with real venues data.
   shows = Show.query.all()
 
-  data = shows
+  data = [
+    {
+    "venue_id": show.venue_id,
+    "venue_name":  Venue.query.with_entities(Venue.name).filter_by(id = show.venue_id).first().name,
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = show.venue.id).first(),
+    "artist_id":show.artist_id,
+    "artist_name":  Artist.query.with_entities(Artist.name).filter_by(id = show.artist_id).first().name,
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = show.artist_id).first(),
+    "start_time": str(show.start_time)
+  }
+  for show in shows
+  ]
 
-  # for show in shows:
-  #   data.append(
-  #     {
-  #       "venue_id": 1,
-  #       "venue_name": Venue.query.with_entities('name').get(show.)
-  #       "artist_id": 4,
-  #       "artist_name": "Guns N Petals",
-  #       "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-  #       "start_time": "2019-05-21T21:30:00.000Z"
-  #     }
-  #   )
+  
 
 
   # data=[{
@@ -767,7 +781,7 @@ def create_shows():
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
   # called to create new shows in the db, upon submitting new show listing form
-  # TODO: insert form data as a new Show record in the db, instead
+  # TODO:<DONE> insert form data as a new Show record in the db, instead
   try:
     form = ShowForm()
 
@@ -783,7 +797,7 @@ def create_show_submission():
     # on successful db insert, flash success
     flash('Show was successfully listed!')
   except:
-  # TODO: on unsuccessful db insert, flash an error instead.
+  # TODO:<DONE> on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Show could not be listed.')
     db.session.rollback()
   # e.g., flash('An error occurred. Show could not be listed.')
