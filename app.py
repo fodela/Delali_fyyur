@@ -180,6 +180,7 @@ def show_venue(venue_id):
       "artist_id": upcoming_show.artist_id,
       "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.artist_id).first().name,
       "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.artist_id).first().image_link,
+      # "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
       "start_time": str(upcoming_show.start_time)
     }
     for upcoming_show in upcoming_shows
@@ -454,6 +455,8 @@ def show_artist(artist_id):
     "past_shows_count": num_past_shows,
     "upcoming_shows_count": num_upcoming_shows,
     }
+
+  flash(data['past_shows'][0]['artist_image_link'])
 #   data1={
 #     "id": 4,
 #     "name": "Guns N Petals",
@@ -586,9 +589,10 @@ def edit_artist_submission(artist_id):
 
     db.session.commit()
     flash('Artist was successfully edited!')
-  except :
+  except Exception as e:
     db.session.rollback()
     flash('An error occurred. Artist could not be listed.')
+    flash(e)
 
   finally:
     db.session.close()
@@ -637,7 +641,7 @@ def edit_venue_submission(venue_id):
   # TODO: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
   try:
-    form = ArtistForm()
+    form = VenueForm()
     
     venue = Venue.query.get(venue_id)
 
@@ -655,9 +659,10 @@ def edit_venue_submission(venue_id):
 
     db.session.commit()
     flash('Artist was successfully edited!')
-  except:
+  except Exception as e:
     db.session.rollback()
     flash('An error occurred. Artist could not be listed.')
+    print("###############",e)
 
   finally:
     db.session.close()
@@ -719,7 +724,7 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
   # displays list of shows at /shows
-  # TODO: replace with real venues data.
+  # TODO:<DONE> replace with real venues data.
   shows = Show.query.all()
 
   data = [
