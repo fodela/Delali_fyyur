@@ -329,11 +329,11 @@ def delete_venue(venue_id):
     venue = Venue.query.get(venue_id)
     db.session.delete(venue)
     db.session.commit()
-    flash('Venue was successfully edited!')
+    flash('Venue was successfully deleted!')
 
   except:
     db.session.rollback()
-    flash('An error occurred. Venue could not be listed.')
+    flash('An error occurred. Venue could not be deleted.')
 
   finally:
     db.session.close()
@@ -341,7 +341,7 @@ def delete_venue(venue_id):
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  return redirect(url_for('venues'))
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -580,7 +580,7 @@ def edit_artist_submission(artist_id):
     artist.facebook_link = form.facebook_link.data.strip()
     artist.image_link = form.image_link.data.strip()
     artist.website_link = form.website_link.data.strip()
-    artist.seeking_venue = form.seeking_venue.data
+    artist.seeking_venues = form.seeking_venue.data
     artist.seeking_description = form.seeking_description.data.strip()
 
     db.session.commit()
@@ -688,19 +688,22 @@ def create_artist_submission():
       image_link = form.image_link.data.strip(),
       facebook_link = form.facebook_link.data.strip(),
       website_link = form.website_link.data.strip(),
-      seeking_venue = form.seeking_venue.data,
+      seeking_venues = form.seeking_venue.data,
       seeking_description = form.seeking_description.data.strip()
     )
 
+
     db.session.add(artist)
-    db.commit()
+    db.session.commit()
 
     # on successful db insert, flash success
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
     # TODO:<Done> on unsuccessful db insert, flash an error instead.
-  except:
+  except Exception as e:
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
     flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
+
+    flash(e)
     db.session.rollback()
 
   finally:
