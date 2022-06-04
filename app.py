@@ -577,7 +577,7 @@ def edit_artist_submission(artist_id):
     artist.city = form.city.data.strip()
     artist.state = form.state.data
     artist.phone = form.phone.data.strip()
-    artist.genres = form.genres.data.strip()
+    artist.genres = form.genres.data
     artist.facebook_link = form.facebook_link.data.strip()
     artist.image_link = form.image_link.data.strip()
     artist.website_link = form.website_link.data.strip()
@@ -586,7 +586,7 @@ def edit_artist_submission(artist_id):
 
     db.session.commit()
     flash('Artist was successfully edited!')
-  except:
+  except :
     db.session.rollback()
     flash('An error occurred. Artist could not be listed.')
 
@@ -646,7 +646,7 @@ def edit_venue_submission(venue_id):
     venue.state = form.state.data
     venue.address = form.address.data.strip()
     venue.phone = form.phone.data.strip()
-    venue.genres = form.genres.data.strip()
+    venue.genres = form.genres.data
     venue.facebook_link = form.facebook_link.data.strip()
     venue.image_link = form.image_link.data.strip()
     venue.website_link = form.website_link.data.strip()
