@@ -366,29 +366,19 @@ def search_artists():
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
   search_term = request.form.get('search_term', '')
-  search_result = Artist.query.filter(Artist.name.ilike(f"%{search_term}%"))
-  num_result = search_result.count()
+  results = Artist.query.filter(Artist.name.ilike(f"%{search_term}%"))
 
-
-
-  response = {
-    "Count": num_result,
-    "data" : []
+  response={
+    "count": results.count(),
+    "data": [{
+      "id": result.id,
+      "name": result.name,
+      "num_upcoming_shows": Show.query.filter(Show.start_time > datetime.now() , Show.artist_id == result.id).count()
+    }
+    for result in results
+    ]
   }
-
-
-  for artist in search_result:
-    response["data"].append(artist.id)
-    response["data"].append(artist.name)
-    response["data"].append(Show.query.filter(Show.start_time > datetime.now(), Show.artist_id == artist.id).count())
-
-  # print(response)
-
-  # response = {
-  #   "count": len(search_result),
-  #   "data": search_result
-  # }
-
+  
   # response={
   #   "count": 1,
   #   "data": [{
@@ -432,8 +422,22 @@ def show_artist(artist_id):
     'website_link' : artist.website_link,
     'seeking_venue' : artist.seeking_venues,
     'seeking_description' : artist.seeking_description,
-    'past_shows': past_shows,
-    "upcoming_shows": upcoming_shows,
+    "past_shows": [{
+      "artist_id": past_show.artist_id,
+      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = past_show.id).first().name,
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = past_show.id).first().image_link,
+      "start_time": str(past_show.start_time)
+    }
+    for past_show in past_shows
+    ],
+     "upcoming_shows": [{
+      "artist_id": upcoming_show.artist_id,
+      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.id).first().name,
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.id).first().image_link,
+      "start_time": str(upcoming_show.start_time)
+    }
+    for upcoming_show in upcoming_shows
+    ],
     "past_shows_count": num_past_shows,
     "upcoming_shows_count": num_upcoming_shows,
     }
@@ -537,6 +541,30 @@ def edit_artist(artist_id):
 def edit_artist_submission(artist_id):
   # TODO: take values from the form submitted, and update existing
   # artist record with ID <artist_id> using the new attributes
+  try:
+    form = ArtistForm()
+    
+    artist = Artist.query.get(artist_id)
+
+    artist.name = form.name.data.strip()
+    artist.city = form.city.data.strip()
+    artist.state = form.state.data
+    artist.phone = form.phone.data.strip()
+    artist.genres = form.genres.data.strip()
+    artist.facebook_link = form.facebook_link.data.strip()
+    artist.image_link = form.image_link.data.strip()
+    artist.website_link = form.website_link.data.strip()
+    artist.seeking_venue = form.seeking_venue.data
+    artist.seeking_description = form.seeking_description.data.strip()
+
+    db.session.commit()
+    flash('Artist was successfully edited!')
+  except:
+    db.session.rollback()
+    flash('An error occurred. Artist could not be listed.')
+
+  finally:
+    db.session.close()
 
   return redirect(url_for('show_artist', artist_id=artist_id))
 
