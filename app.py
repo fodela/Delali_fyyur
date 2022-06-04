@@ -437,16 +437,16 @@ def show_artist(artist_id):
     'seeking_description' : artist.seeking_description,
     "past_shows": [{
       "artist_id": past_show.artist_id,
-      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = past_show.id).first().name,
-      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = past_show.id).first().image_link,
+      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = past_show.artist_id).first().name,
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = past_show.artist_id).first().image_link,
       "start_time": str(past_show.start_time)
     }
     for past_show in past_shows
     ],
      "upcoming_shows": [{
       "artist_id": upcoming_show.artist_id,
-      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.id).first().name,
-      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.id).first().image_link,
+      "artist_name": Artist.query.with_entities(Artist.name).filter_by(id = upcoming_show.artist_id).first().name,
+      "artist_image_link":Artist.query.with_entities(Artist.image_link).filter_by(id = upcoming_show.artist_id).first().image_link,
       "start_time": str(upcoming_show.start_time)
     }
     for upcoming_show in upcoming_shows
