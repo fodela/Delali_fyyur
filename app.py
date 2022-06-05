@@ -1,6 +1,6 @@
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Imports
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 from email.policy import default
 from pickle import NONE
@@ -23,9 +23,9 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 import sys
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # App Config.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 app = Flask(__name__)
 moment = Moment(app)
@@ -35,25 +35,27 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
-#----------------------------------------------------------------------------#
-# Models.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
+#  Models.
+# ----------------------------------------------------------------------------#
 from models import *
 
 
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Filters.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 def format_datetime(value, format='medium'):
-  date = dateutil.parser.parse(value)
-  if format == 'full':
-      format="EEEE MMMM, d, y 'at' h:mma"
-  elif format == 'medium':
-      format="EE MM, dd, y h:mma"
-  return babel.dates.format_datetime(date, format, locale='en')
+    date = dateutil.parser.parse(value)
+    if format == 'full':
+        format = "EEEE MMMM, d, y 'at' h:mma"
+
+    elif format == 'medium':
+        format = "EE MM, dd, y h:mma"
+    return babel.dates.format_datetime(date, format, locale='en')
 
 app.jinja_env.filters['datetime'] = format_datetime
+
 
 #----------------------------------------------------------------------------#
 # Controllers.
@@ -546,9 +548,11 @@ def create_show_submission():
 
     # on successful db insert, flash success
     flash('Show was successfully listed!')
-  except:
+  except Exception as e:
+    flash(e)
   
     flash('An error occurred. Show could not be listed.')
+
     print(sys.exc_info())
 
     db.session.rollback()

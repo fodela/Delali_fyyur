@@ -13,14 +13,14 @@ def validate_phone(self,phone):
     phone_num  = '^([0-9]{3})[-][0-9]{3}[-][0-9]{4}$'
     match = re.search(phone_num, phone.data)
     if not match:
-        raise Exception('Invalid phone number. Phone number must be in format xxx-xxx-xxxx')
+        raise ValidationError('Invalid phone number. Phone number must be in format xxx-xxx-xxxx')
         ValidationError
 
 def validate_facebook_link(self, facebook_link):
     matching_facebook_link  = '/(?:https?:\/\/)?(?:www\.)?facebook\.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[\w\-]*\/)*([\w\-\.]*)/'
     match = re.search(matching_facebook_link, facebook_link.data)
     if not match:
-        raise Exception('Invalid facebook link')
+        raise ValidationError('Invalid facebook link')
 
 class ShowForm(Form):
     artist_id = StringField(
