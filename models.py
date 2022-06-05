@@ -1,6 +1,8 @@
+# import configured database from app.py
 from app import db
 
 from datetime import datetime
+
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
@@ -18,13 +20,15 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean(), default=False)
     seeking_description = db.Column(db.String())
     shows = db.relationship('Show', backref='venue', lazy=True)
-    
+
     def __repr__(self):
       return f"<Venue | {self.id}  {self.name} Image: {self.image_link} >"
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
+
 class Artist(db.Model):
+
     __tablename__ = 'Artist'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -41,17 +45,29 @@ class Artist(db.Model):
     shows = db.relationship('Show', backref='artist', lazy=True)
 
     def __repr__(self):
-      return f"<Artist | ID: {self.id} Name: {self.name} Image: {self.genres} >"
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+	    return f"<Artist | ID: {self.id} Name: {self.name}>"
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+
 class Show(db.Model):
-  __table__name = 'Show'
-  id = db.Column(db.Integer, primary_key=True)
-  start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-  venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
-  artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
-  
-  def __repr__(self):
-    return f"<Show | id: {self.id} venue: {self.venue_id} artist: {self.artist_id} starts at: {self.start_time}>"
+    __table__name = 'Show'
+    id = db.Column(
+		db.Integer, 
+		primary_key=True)
+    start_time = db.Column(
+		db.DateTime, 
+		nullable=False, 
+		default=datetime.utcnow
+		)
+    venue_id = db.Column(
+		db.Integer, 
+		db.ForeignKey('Venue.id'), 
+		nullable=False
+		)
+    artist_id = db.Column(
+		db.Integer, 
+		db.ForeignKey('Artist.id'), 
+		nullable=False)
+
+    def __repr__(self):
+        return f"<Show | id: {self.id} venue: {self.venue_id} artist: {self.artist_id}>"
